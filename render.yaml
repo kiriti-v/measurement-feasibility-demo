@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: measurement-feasibility-demo
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn loreta.public_demo:server --bind 0.0.0.0:$PORT --workers 1 --threads 2 --timeout 60 --access-logfile -
+    healthCheckPath: /healthz
+    autoDeployTrigger: checksPass
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.7
+      - key: OPENBLAS_NUM_THREADS
+        value: "1"
+      - key: OMP_NUM_THREADS
+        value: "1"
+      - key: FEASIBILITY_PUBLIC_DEMO
+        value: "1"

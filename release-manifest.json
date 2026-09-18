@@ -1,0 +1,13 @@
+{
+  ".github/workflows/ci.yml": "9726d8d8167deeb318c4dffb13f6ec460fc42fbafc1526d56fb46ab7ea5821b0",
+  ".gitignore": "843f6db02f8968ec33ece4efff5569fec23c02fc4d1bc26b2a63e8c1390a478a",
+  "README.md": "1cdbfbdb5aa8943c81fcceed822f521da7f3e9174424350fc6336766e1b80914",
+  "loreta/__init__.py": "18aa75c5e886e5ba1945324102dd74e34cc2a4bd157763ab7000b7b5370171b9",
+  "loreta/general_feasibility_explorer.py": "c4bd129b53208216b47ba53b80af3056b7390789887d69ebbb8bcf90e97e80a3",
+  "loreta/public_demo.py": "0d59abb37d0fe6d342559d8c2893353572569a55cf7b4bbff0a350caa83456e3",
+  "loreta/reactivity.py": "494723864831a7815f25053687df7f74470120155ee793c3c10c505e215ab444",
+  "loreta/staging_recipes.py": "b894189a19bb29995b8b4c53990e3a4d0bc22d25b2fbdff692529b785353bab7",
+  "render.yaml": "168ab5936945634961f9ce7edbe7033886ac7c7f93ef6d05f416a6b27eab2365",
+  "requirements.txt": "e72e6217a1dbd7e1ee8bf633a18250ecadf626d71fc9e92b9898ccabe5522edf",
+  "tests/test_public_demo.py": "b6a3f59e930f917d0da995b357743cce098d734f2279b027e6c755e867e8197e"
+}
