@@ -67,7 +67,8 @@ def test_release_allowlist():
     assert set(manifest) == {
         "loreta/__init__.py", "loreta/public_demo.py", "loreta/general_feasibility_explorer.py",
         "loreta/reactivity.py", "loreta/staging_recipes.py", "requirements.txt", "render.yaml",
-        "README.md", ".github/workflows/ci.yml", "tests/test_public_demo.py", ".gitignore"}
+        "README.md", ".github/workflows/ci.yml", "tests/test_public_demo.py", ".gitignore",
+        "loreta/quick_demo.py", "loreta/quick_demo.html"}
     actual = {str(p.relative_to(root)) for p in root.rglob("*") if p.is_file()
               and not any(x in p.parts for x in [".git", "__pycache__", ".pytest_cache", ".venv"])}
     assert actual == set(manifest) | {"release-manifest.json"}
@@ -87,3 +88,30 @@ def test_log_scale_and_variability_scenario():
 def test_bounded_target(target):
     with pytest.raises(ValueError):
         demo.validate_selection("lower", "adr", "Condition A", target)
+
+
+def test_quick_page_is_self_contained_and_classic_is_retained():
+    client = demo.server.test_client()
+    page = client.get("/").get_data(as_text=True)
+    assert 'name="viewport"' in page
+    assert 'src=' not in page and 'fetch(' not in page
+    assert 'Half-size target' in page and 'Two separate projections' in page
+    assert 'not measured EEG here' in page
+    assert '__DATA__' not in page and '__RELEASE__' not in page
+    assert len(page.encode()) < 20000
+    assert client.get('/classic').status_code == 200
+
+
+@pytest.mark.parametrize('fraction', [.25, .5, 1, 1.5, 2])
+def test_browser_summary_planning_matches_python(fraction):
+    import math
+    from loreta.quick_demo import summaries
+    for key, row in summaries(demo.BUNDLES, demo.engine).items():
+        noise, marker, condition = key.split('|')
+        measured = demo.engine.measurement(demo.BUNDLES[noise], marker, 'whole_scalp',
+                                           condition, 'Reference', fraction)
+        target = abs(row['mean']) * fraction
+        minutes = row['minutes'] * (row['floor'] / target) ** 2
+        n = math.ceil((1.959963984540054 + .8416212335729143)**2 * (row['sd']/target)**2)
+        assert minutes == pytest.approx(measured['minutes_at_target'])
+        assert n == measured['required_n']

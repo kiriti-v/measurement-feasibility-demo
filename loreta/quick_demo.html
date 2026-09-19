@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Measurement feasibility</title>
+<style>
+:root{color-scheme:light;--ink:#17212b;--muted:#52616b;--blue:#1d5d78;--line:#d3dfe4;--paper:#f6f8f9}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.5 system-ui,sans-serif}
+main{max-width:900px;margin:auto;padding:24px}h1{font-size:26px;line-height:1.2;margin:0 0 8px}h2{font-size:19px;margin:0 0 12px}
+p{max-width:72ch;margin:8px 0 16px}.muted,small{color:var(--muted)}.lead{font-size:18px}
+fieldset{border:0;padding:0;margin:0}legend{font-weight:650;margin-bottom:8px}label{display:block;font-weight:600;margin-bottom:6px}
+select,button{font:inherit;min-height:44px;border:1px solid var(--line);background:white;color:var(--ink);border-radius:5px;padding:8px 12px}
+select{width:100%}button{cursor:pointer}button[aria-pressed=true]{background:var(--blue);color:white;border-color:var(--blue)}
+button:focus-visible,select:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid #ba7400;outline-offset:3px}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0}.wide{grid-column:1/-1}.buttons{display:flex;gap:8px;flex-wrap:wrap}
+.target{background:white;padding:18px;border:1px solid var(--line);border-radius:6px}input[type=range]{width:100%;accent-color:var(--blue);height:32px;margin:6px 0}
+.results{display:grid;grid-template-columns:1fr 1fr;gap:20px;border-top:3px solid var(--blue);padding:12px 0;background:var(--paper);margin:18px 0;position:sticky;top:0;z-index:2}
+.result h2{font-size:16px;margin:0}.number{font-size:34px;font-weight:700;color:var(--blue);line-height:1.25;margin:8px 0}.result p{font-size:14px}
+dl{display:grid;grid-template-columns:1fr auto;gap:7px 20px;margin:12px 0}dt{color:var(--muted)}dd{margin:0;font-variant-numeric:tabular-nums}
+details{border-top:1px solid var(--line);padding:14px 0}summary{cursor:pointer;font-weight:600;min-height:36px}a{color:var(--blue)}footer{margin-top:24px;font-size:12px}
+@media(max-width:520px){main{padding:18px 16px}h1{font-size:23px}.controls{gap:12px}.number{font-size:30px}.results{gap:16px}.result p{font-size:13px}dl{font-size:14px}}
+</style></head><body><main>
+<h1>Measurement feasibility</h1>
+<p class="muted">Synthetic demo. 40 simulated subjects; no patient data or uploads.</p>
+<p class="lead">How much usable recording time—and how many people—might a smaller change require?</p>
+<p>Try <strong>Higher variability</strong>, then <strong>Half-size target</strong>. Watch the two planning estimates change.</p>
+<section class="results" aria-live="polite" aria-atomic="true">
+<div class="result"><h2>Usable min / condition</h2><div class="number" id="time">—</div><p>Projected p95 reaches target.</p></div>
+<div class="result"><h2>Paired sample size</h2><div class="number" id="people">—</div><p>80% power; fixed duration.</p></div>
+</section>
+<div class="controls">
+<fieldset class="wide"><legend>Within-condition variability</legend><div class="buttons">
+<button type="button" id="lower" aria-pressed="true">Lower variability</button><button type="button" id="higher" aria-pressed="false">Higher variability</button>
+</div></fieldset>
+<div><label for="marker">Marker</label><select id="marker"><option value="adr">Alpha/delta ratio</option><option value="theta_rel">Relative theta</option></select></div>
+<div><label for="condition">Compared with reference</label><select id="condition"><option>Condition A</option><option>Condition B</option></select></div>
+</div>
+<section class="target"><label for="target">Target change: <output id="target-value"></output></label>
+<input id="target" type="range" min="25" max="200" step="25" value="100" aria-describedby="target-help">
+<div class="buttons"><button type="button" id="half">Half-size target</button><button type="button" id="observed">Observed-size target</button></div>
+<small id="target-help">Illustrative target, scaled from this simulation’s observed mean—not a clinical threshold.</small></section>
+<p><strong>Two separate projections.</strong> These are not a jointly optimized protocol or validated individual detection limits.</p>
+<details open><summary>What the simulated data show</summary><dl>
+<dt>Paired subjects</dt><dd id="n"></dd><dt>Observed mean change</dt><dd id="mean"></dd>
+<dt>Matched within-recording p95</dt><dd id="floor"></dd><dt>Paired difference SD</dt><dd id="sd"></dd>
+<dt>Original usable time / condition</dt><dd id="duration"></dd><dt>Split-half Spearman–Brown</dt><dd id="sb"></dd>
+</dl></details>
+<details><summary>Assumptions and how this works</summary>
+<p>The same Python analysis used in the full explorer computes eight synthetic summaries. This page embeds those summaries; target changes are calculated in your browser without server round trips.</p>
+<p>Time = original usable time × (p95 / target)². This assumes independent, stationary epochs; real drift and artifact loss can invalidate it. Time is usable data, not total acquisition time.</p>
+<p>N = ceiling[(1.960 + 0.842)² × (paired SD / target)²], for 80% power and two-sided α = .05. This normal approximation can be optimistic at small N. It holds SD and recording duration fixed; it does not inherit the time projection.</p>
+<p>Real planning needs a scientifically justified target and independently estimated, state-, protocol-, and duration-matched variance. Internal split halves are not independent test–retest validation. The p95 is a descriptive benchmark, not a clinical decision threshold.</p>
+<p>Alpha/delta ratio changes use log10 units; 0.301 means a two-fold ratio. Relative theta is displayed in percentage points. Both are simulated marker values, not measured EEG here.</p></details>
+<p><a href="/classic">Open full analytical charts</a></p>
+<noscript><p>This interactive demo needs JavaScript. No data are sent when you use its controls.</p></noscript>
+<footer>measurement-feasibility-demo · release __RELEASE__</footer>
+</main><script id="demo-data" type="application/json">__DATA__</script><script>
+'use strict';
+const DATA=JSON.parse(document.getElementById('demo-data').textContent);
+const el=id=>document.getElementById(id);let noise='lower';
+function compute(d,f){const target=Math.abs(d.mean)*f;return {target,minutes:d.minutes*(d.floor/target)**2,n:Math.ceil((1.959963984540054+.8416212335729143)**2*(d.sd/target)**2)};}
+function update(){const start=performance.now();const marker=el('marker').value,d=DATA[[noise,marker,el('condition').value].join('|')],f=+el('target').value/100,r=compute(d,f);
+ const val=x=>marker==='theta_rel'?(100*x).toFixed(2)+' pp':x.toFixed(3)+' log10';
+ el('target-value').textContent=val(r.target)+' ('+Math.round(f*100)+'% of mean)';
+ el('time').textContent=r.minutes.toFixed(1)+' min';el('people').textContent=r.n+' people';
+ for(const [id,value] of Object.entries({n:d.n,mean:val(d.mean),floor:val(d.floor),sd:val(d.sd),duration:d.minutes.toFixed(1)+' min',sb:d.sb.toFixed(2)}))el(id).textContent=value;
+ for(const key of ['lower','higher'])el(key).setAttribute('aria-pressed',String(noise===key));
+ document.body.dataset.updateMs=(performance.now()-start).toFixed(3);
+}
+for(const key of ['lower','higher'])el(key).onclick=()=>{noise=key;update()};
+for(const key of ['marker','condition'])el(key).onchange=update;el('target').oninput=update;
+el('half').onclick=()=>{el('target').value=50;update()};el('observed').onclick=()=>{el('target').value=100;update()};update();document.body.dataset.readyMs=performance.now().toFixed(1);
+</script></body></html>

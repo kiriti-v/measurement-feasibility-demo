@@ -3,6 +3,11 @@
 A synthetic demonstration of repeated-measures marker contrasts, within-recording variability,
 split-half consistency, and illustrative recording-time and sample-size planning.
 
+The root page is a small mobile-friendly, self-contained planning demonstration. Its summaries
+come from the same synthetic Python analysis; target changes calculate locally without network
+requests. `/classic` retains all analytical charts. The existing Render Free service can still
+sleep before either page is delivered: this frontend improvement does not remove host cold starts.
+
 This package contains no participant data. Its two presets simulate different amounts of
 within-condition variability using a fixed random seed. The numbers are not study results.
 The analytical functions are shared with the local research tool; this hosted interface is

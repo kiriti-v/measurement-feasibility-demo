@@ -11,6 +11,7 @@ import pandas as pd
 from dash import Dash, Input, Output, dcc, html
 from flask import abort, jsonify, request
 from loreta import general_feasibility_explorer as engine
+from loreta.quick_demo import page
 
 APP_ID = "measurement-feasibility-demo"
 RELEASE = os.environ.get("RENDER_GIT_COMMIT", "local-unreleased")
@@ -35,6 +36,7 @@ def synthetic_bundle(noise: float) -> engine.DatasetBundle:
 
 
 BUNDLES = {"lower": synthetic_bundle(.2), "higher": synthetic_bundle(.65)}
+QUICK_PAGE = page(BUNDLES, engine, RELEASE)
 app = Dash(__name__, title="Measurement feasibility", include_assets_files=False,
            assets_folder="_no_public_assets")
 app.index_string = engine.app.index_string
@@ -68,6 +70,8 @@ app.layout = html.Main(className="shell", children=[
 
 @server.before_request
 def request_boundary():
+    if request.method in ("GET", "HEAD") and request.path == "/":
+        return QUICK_PAGE, 200, {"Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache"}
     if request.method == "POST":
         if request.path != "/_dash-update-component":
             abort(404)
